@@ -93,7 +93,7 @@ class PlayedCardPack(CardPack):
         Returns:
             str: Last card.
         """
-        return str(self.cards[len(self.cards) - 1])
+        return str(self.cards[-1])
 
 
 class CardHand:
