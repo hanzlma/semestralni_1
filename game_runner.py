@@ -201,7 +201,7 @@ Card values:
         if self.desired_color:
             print(f"Current color: {self.desired_color}")
         self.human_player.list_cards()
-        # print(f"TEST: {', '.join(self.computer_player.card_hand.cards)}")
+        print(f"TEST: {', '.join(self.computer_player.card_hand.cards)}")
 
     def computer_play(self):
         """Main method of computer player turn logic."""
@@ -284,7 +284,7 @@ Card values:
 
         current_hand = comp_hand if is_maximizing else human_hand
 
-        moves = self._get_valid_moves(current_hand, last_card, is_active)
+        moves = self._get_valid_moves(current_hand, last_card, is_active, is_maximizing)
 
         if not moves:
             if is_active and last_card[1] == "a":
@@ -360,11 +360,17 @@ Card values:
                     break
             return min_eval, best_move
 
-    def evaluate_state(self, comp_hand, human_hand):
+    def evaluate_state(self, comp_hand: list[str], human_hand: list[str]):
         """Heuristic: Robot wants small hand, Human wants large hand."""
         return len(human_hand) - len(comp_hand)
 
-    def _get_valid_moves(self, hand, last_card, is_active):
+    def _get_valid_moves(
+        self,
+        hand: list[str],
+        last_card: str,
+        is_active: bool,
+        computer_turn: bool = False,
+    ):
         """Generates all possible moves. Returns list of tuples (card, color_choice)."""
         valid_moves = []
 
@@ -379,8 +385,15 @@ Card values:
 
         for card in playable:
             if card[1] == "m":
-                # If playing 'm', try all color possibilities
-                for color in ["l", "k", "c", "z"]:
+                # If playing 'm', try all suitable colors
+                valid_colors = ["l", "k", "c", "z"]
+                if computer_turn:
+                    suitable_colors = {c[0] for c in hand if c != card and c[1] != "m"}
+
+                if suitable_colors:
+                    valid_colors = list(suitable_colors)
+
+                for color in valid_colors:
                     valid_moves.append((card, color))
             else:
                 valid_moves.append((card, None))
@@ -392,8 +405,5 @@ Card values:
 
         if last_card[1] == "m":
             return card[0] == last_card[0] or card[1] == "m"
-
-        if last_card[1] in ["7", "a"]:
-            return card[1] == last_card[1]
 
         return card[0] == last_card[0] or card[1] == last_card[1] or card[1] == "m"
