@@ -1,8 +1,30 @@
 import unittest as u
-from cards import GiveCardPack, PlayedCardPack
+from collections import deque
+from cards import GiveCardPack, PlayedCardPack, CardHand
 
 
 class Cards(u.TestCase):
+    def test_givecard_instance(self):
+        self.assertIsInstance(
+            GiveCardPack().cards,
+            deque,
+            f"GiveCardPack cards should be of instance deque[str] not {type(GiveCardPack().cards)}",
+        )
+
+    def test_playedcard_instance(self):
+        self.assertIsInstance(
+            PlayedCardPack().cards,
+            deque,
+            f"GiveCardPack cards should be of instance deque[str] not {type(PlayedCardPack().cards)}",
+        )
+
+    def test_cardhand_instance(self):
+        self.assertIsInstance(
+            CardHand().cards,
+            list,
+            f"CardHand should be of instance list not {type(CardHand().cards)}",
+        )
+
     def test_generate_cards(self):
         expected_cards = [
             "la",
