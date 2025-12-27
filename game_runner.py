@@ -1,3 +1,5 @@
+from collections import Counter
+import itertools as i
 from player import Player, HumanPlayer, ComputerPlayer
 from cards import GiveCardPack, PlayedCardPack
 
@@ -34,11 +36,25 @@ class GameRunner:
                 self.take_card(self.computer_player)
         self.played_card_pack.add_card(self.give_card_pack.give_card())
 
+    def select_difficulty(self) -> None:
+        """Selects the game difficulty."""
+        inp = ""
+        while inp not in ["Easy", "easy", "Hard", "hard", "e", "h"]:
+            inp = input("Select difficulty (Easy / Hard): ")
+            if inp not in ["Easy", "easy", "Hard", "hard", "e", "h"]:
+                print("Incorrect input.\n")
+        if inp in ["Easy", "easy", "e"]:
+            self.easy = True
+        else:
+            self.easy = False
+        print()
+
     def run_game(self):
         """Main runner function. Runs the game loop."""
         print("""
               Prsi Card Game
               """)
+        self.select_difficulty()
         while True:
             while not self.played:
                 self.print_current_game_state()
@@ -201,27 +217,52 @@ Card values:
         if self.desired_color:
             print(f"Current color: {self.desired_color}")
         self.human_player.list_cards()
-        print(f"TEST: {', '.join(self.computer_player.card_hand.cards)}")
+        # print(f"TEST: {', '.join(self.computer_player.card_hand.cards)}")
 
     def computer_play(self):
         """Main method of computer player turn logic."""
         print("Robot turn:")
 
         comp_hand = self.computer_player.card_hand.cards[:]
-        human_hand = self.human_player.card_hand.cards[:]
-        physical_card = self.played_card_pack.last_card()
-
-        if physical_card[1] == "m" and self.desired_color:
-            current_card = (self.desired_color, "m")
-        else:
-            current_card = physical_card
-
-        is_active = self.active_card
-
-        _, move = self.minimax(
-            comp_hand, human_hand, current_card, is_active, depth=4, is_maximizing=True
+        human_hands = (
+            list(
+                [
+                    list(c)
+                    for c in i.combinations(
+                        self.human_player.card_hand.cards[:]
+                        + list(self.give_card_pack.cards)[:],
+                        self.human_player.get_card_count(),
+                    )
+                ]
+            )
+            if self.easy
+            else [self.human_player.card_hand.cards[:]]
         )
+        suggested_moves = []
+        for human_hand in human_hands:
+            physical_card = self.played_card_pack.last_card()
 
+            if physical_card[1] == "m" and self.desired_color:
+                current_card = (self.desired_color, "m")
+            else:
+                current_card = physical_card
+
+            is_active = self.active_card
+
+            _, move = self.minimax(
+                comp_hand,
+                human_hand,
+                current_card,
+                is_active,
+                depth=4,
+                is_maximizing=True,
+            )
+            suggested_moves.append(move)
+        move = None
+        if suggested_moves:
+            vote_counts = Counter(suggested_moves)
+            best_move_tuple = vote_counts.most_common(1)[0]
+            move = best_move_tuple[0]
         if move:
             card, color_choice = move
             if card[1] == "m":
@@ -387,6 +428,7 @@ Card values:
             if card[1] == "m":
                 # If playing 'm', try all suitable colors
                 valid_colors = ["l", "k", "c", "z"]
+                suitable_colors = []
                 if computer_turn:
                     suitable_colors = {c[0] for c in hand if c != card and c[1] != "m"}
 
