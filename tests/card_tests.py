@@ -3,19 +3,23 @@ from collections import deque
 from cards import GiveCardPack, PlayedCardPack, CardHand
 
 
-class Cards(u.TestCase):
+class CardTests(u.TestCase):
+    def setUp(self):
+        self.give_pack = GiveCardPack()
+        self.played_pack = PlayedCardPack()
+
     def test_givecard_instance(self):
         self.assertIsInstance(
-            GiveCardPack().cards,
+            self.give_pack.cards,
             deque,
-            f"GiveCardPack cards should be of instance deque[str] not {type(GiveCardPack().cards)}",
+            f"GiveCardPack cards should be of instance deque[str] not {type(self.give_pack.cards)}",
         )
 
     def test_playedcard_instance(self):
         self.assertIsInstance(
-            PlayedCardPack().cards,
+            self.played_pack.cards,
             deque,
-            f"GiveCardPack cards should be of instance deque[str] not {type(PlayedCardPack().cards)}",
+            f"GiveCardPack cards should be of instance deque[str] not {type(self.played_pack.cards)}",
         )
 
     def test_cardhand_instance(self):
@@ -79,8 +83,7 @@ class Cards(u.TestCase):
         )
 
     def test_give_card(self):
-        pack = GiveCardPack()
-        given_card = pack.give_card()
+        given_card = self.give_pack.give_card()
         self.assertIn(
             given_card,
             GiveCardPack.generate_all_cards(),
@@ -88,26 +91,24 @@ class Cards(u.TestCase):
         )
 
     def test_give_card_empty(self):
-        pack = GiveCardPack()
         for _ in range(32):
-            pack.give_card()
-        given = pack.give_card()
+            self.give_pack.give_card()
+        given = self.give_pack.give_card()
         self.assertFalse(
             given, f'Give card should have returned false, returned "{given}" instead.'
         )
 
     def test_give_all_cards(self):
-        pack = PlayedCardPack()
-        pack.cards = GiveCardPack.generate_all_cards()
-        last = pack.last_card()
-        pack.give_all_cards()
+        self.played_pack.cards = GiveCardPack.generate_all_cards()
+        last = self.played_pack.last_card()
+        self.played_pack.give_all_cards()
         self.assertEqual(
-            len(pack.cards),
+            len(self.played_pack.cards),
             1,
-            f"Exactly one card should remain in the pack, instead {len(pack.cards)} remained",
+            f"Exactly one card should remain in the pack, instead {len(self.played_pack.cards)} remained",
         )
         self.assertIn(
             last,
-            pack.cards,
-            f'"{last}" should have remained in the pack, instead "{pack.cards[-1]}" remained',
+            self.played_pack.cards,
+            f'"{last}" should have remained in the pack, instead "{self.played_pack.cards[-1]}" remained',
         )

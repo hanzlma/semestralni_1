@@ -2,6 +2,7 @@ import unittest as u
 from cards import GiveCardPack, PlayedCardPack
 from game_runner import GameRunner
 from player import ComputerPlayer, HumanPlayer
+from unittest.mock import patch
 
 
 class RunnerTests(u.TestCase):
@@ -189,4 +190,52 @@ class RunnerTests(u.TestCase):
             self.runner.played_card_pack.cards,
             ["kk", "lk"],
             "The played card should be added to the played card pack.",
+        )
+
+    @patch("builtins.print")
+    def test_play_card_not_in_pack(self, mock_print):
+        self.runner.human_player.card_hand.cards = ["zk"]
+        self.runner.played_card_pack.cards = ["kk"]
+        self.assertFalse(
+            self.runner.play_card(self.runner.human_player, "lk"),
+            "Should return False since it is not a valid move. Player doesn't have that card.",
+        )
+        self.assertNotIn(
+            "zk",
+            self.runner.played_card_pack.cards,
+            "Since player could not play that card, it should not be added to the played card pack.",
+        )
+        mock_print.assert_called_with(
+            "You dont have the card you want to play. Play a different card or take a card."
+        )
+
+    @patch("builtins.print")
+    def test_play_card_negative(self, mock_print):
+        self.runner.human_player.card_hand.cards = ["zk"]
+        self.runner.played_card_pack.cards = ["l9"]
+        self.assertFalse(
+            self.runner.play_card(self.runner.human_player, "zk"),
+            "Should return False since it is not a valid move.",
+        )
+        self.assertNotIn(
+            "zk",
+            self.runner.played_card_pack.cards,
+            "Since player could not play that card, it should not be added to the played card pack.",
+        )
+        mock_print.assert_called_with("You cannot play this card now.")
+
+    @patch("builtins.input", return_value="Easy")
+    def test_select_difficulty_easy(self, mock_input):
+        self.runner.select_difficulty()
+        self.assertTrue(
+            self.runner.easy,
+            "After setting difficulty to easy, the attribute should be True.",
+        )
+
+    @patch("builtins.input", return_value="Hard")
+    def test_select_difficulty_hard(self, mock_input):
+        self.runner.select_difficulty()
+        self.assertFalse(
+            self.runner.easy,
+            "After setting difficulty to hard, the attribute should be False.",
         )
