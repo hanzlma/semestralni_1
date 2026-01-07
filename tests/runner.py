@@ -1,7 +1,8 @@
+# This file can be used as an replacement of pytest.
 import unittest as u
-from .card_tests import CardTests
-from .player_tests import PlayerTests
-from .runner_tests import RunnerTests
+from .card_test import CardTests
+from .player_test import PlayerTests
+from .runner_test import RunnerTests
 
 
 def get_tests(testClass):

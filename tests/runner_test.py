@@ -205,6 +205,11 @@ class RunnerTests(u.TestCase):
             self.runner.played_card_pack.cards,
             "Since player could not play that card, it should not be added to the played card pack.",
         )
+        self.assertEqual(
+            self.runner.human_player.card_hand.cards,
+            ["zk"],
+            "Player's hand should not change after an invalid play.",
+        )
         mock_print.assert_called_with(
             "You dont have the card you want to play. Play a different card or take a card."
         )
