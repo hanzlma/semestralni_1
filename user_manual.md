@@ -2,7 +2,7 @@
 
 ## How to play
 1. Open a terminal in this directory.
-2. Enter following command in the terminal: "python -m main"
+2. Enter the following command in the terminal: "python -m main"
 
 ## Selecting a difficulty
 After turning the game on, you will be asked with choosing the difficulty of the game. There are two options:
