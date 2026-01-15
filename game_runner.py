@@ -79,22 +79,26 @@ class GameRunner:
         Args:
             command (str): Inputed command.
         """
-        match command.split()[0]:
-            case "list_cards" | "lc":
-                self.human_player.list_cards()
+        try:
+            match command.split()[0]:
+                case "list_cards" | "lc":
+                    self.human_player.list_cards()
 
-            case "play_card" | "pc":
-                if self.play_card(self.human_player, command.split()[1]):
+                case "play_card" | "pc":
+                    if self.play_card(self.human_player, command.split()[1]):
+                        self.played = True
+                        self.active_card = True
+
+                case "take_card" | "tc":
+                    if self.active_card and self.played_card_pack.last_card()[1] == "a":
+                        print("\nYou cannot take a card right now.\n")
+                        return
+                    self.take_card(self.human_player)
                     self.played = True
-                    self.active_card = True
+                    self.active_card = False
 
-            case "take_card" | "tc":
-                self.take_card(self.human_player)
-                self.played = True
-                self.active_card = False
-
-            case "help" | "h":
-                print("""
+                case "help" | "h":
+                    print("""
 Available commands:
     - list_cards ... lists all cards the player has in his hand
     - play_card <card> ... plays the card if can be played, otherwise it says that it is unplayable
@@ -105,17 +109,17 @@ Available commands:
     - exit ... exits the program
                       """)
 
-            case "stand_round" | "sr":
-                if self.active_card and self.played_card_pack.last_card()[1] == "a":
-                    self.played = True
-                    self.active_card = False
-                else:
-                    print(
-                        "You are not playing against an active ace so you cannot stand a round."
-                    )
+                case "stand_round" | "sr":
+                    if self.active_card and self.played_card_pack.last_card()[1] == "a":
+                        self.played = True
+                        self.active_card = False
+                    else:
+                        print(
+                            "You are not playing against an active ace so you cannot stand a round."
+                        )
 
-            case "card_info" | "ci":
-                print("""
+                case "card_info" | "ci":
+                    print("""
 Card colors: l, k, c, z
 Card values:
     - a ... ace
@@ -128,9 +132,12 @@ Card values:
     - s
 """)
 
-            case _:
-                print("Unknown command, use 'help' for list of all available commands.")
-
+                case _:
+                    print(
+                        "Unknown command, use 'help' for list of all available commands."
+                    )
+        except Exception:
+            pass
         print()
 
     def take_card(self, player: Player, recursive=False) -> None:
@@ -174,12 +181,12 @@ Card values:
             self.desired_color = None
             if card[1] == "m" and type(player) is not ComputerPlayer:
                 while True:
-                    desired = input("Select the color you want to switch to:")
+                    desired = input("Select the color you want to switch to: ")
                     if desired in ["l", "k", "c", "z"]:
                         self.desired_color = desired
                         break
                     else:
-                        print("Incorrect color, try again")
+                        print("Incorrect color, try again.")
             elif card[1] == "7":
                 self.stacking += 2
             self.played_card_pack.add_card(card)
@@ -238,6 +245,7 @@ Card values:
             if self.easy
             else [self.human_player.card_hand.cards[:]]
         )
+        print(len(human_hands))
         suggested_moves = []
         for human_hand in human_hands:
             physical_card = self.played_card_pack.last_card()
