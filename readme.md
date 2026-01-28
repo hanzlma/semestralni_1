@@ -20,6 +20,11 @@ pytest
 Runs the game
 ### game_runner.py
 Contains the runner class which manages the game as a whole
+#### Notable methods
+1. minimax - decides what will the computer player do
+2. take_card
+3. play_card
+4. run_game - runs the game loop
 ### player.py
 Contains the player classes, both for the human and the computer player
 ### cards.py
