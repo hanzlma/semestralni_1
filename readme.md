@@ -1,4 +1,4 @@
-# Prsi card game with CLI interface
+# Prsi card game with CLI interface (only PvE)
 
 ## How to run
 Using a terminal in this directory
