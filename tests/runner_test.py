@@ -6,10 +6,13 @@ from unittest.mock import patch
 
 
 class RunnerTests(u.TestCase):
+    """Testcase containing tests for the main runner class."""
+
     def setUp(self):
         self.runner = GameRunner()
 
     def test_init(self):
+        """Testing correct init method functionality."""
         self.assertIsInstance(self.runner.computer_player, ComputerPlayer)
         self.assertIsInstance(self.runner.human_player, HumanPlayer)
         self.assertIsInstance(self.runner.give_card_pack, GiveCardPack)
@@ -49,6 +52,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_check_card_playable_positive(self):
+        """Testing that check_card_playable method returns True when the card can be played."""
         self.runner.played_card_pack.add_card("l8")
         self.assertTrue(
             self.runner.check_card_playable("z8"),
@@ -56,6 +60,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_check_card_playable_negative(self):
+        """Testing that check_card_playable method returns False when the card cannot be played."""
         self.runner.played_card_pack.add_card("l8")
         self.assertFalse(
             self.runner.check_card_playable("z9"),
@@ -63,18 +68,21 @@ class RunnerTests(u.TestCase):
         )
 
     def test_playable_sim_positive(self):
+        """Testing that _is_playable_sim returns True when the card can be played."""
         self.assertTrue(
             self.runner._is_playable_sim("z8", "l8"),
             "Method _is_playable_sim should return True for last played l8 and card z8.",
         )
 
     def test_playable_sim_negative(self):
+        """Testing that _is_playable_sim returns False when the card cannot be played."""
         self.assertFalse(
             self.runner._is_playable_sim("z9", "l8"),
             "Method _is_playable_sim should return False for last played l8 and card z9.",
         )
 
     def test_get_valid_moves_default(self):
+        """Testing that the _get_valid_moves returns correct playable cards according to set gamestate."""
         self.assertEqual(
             self.runner._get_valid_moves(["l7", "ka", "kk"], "lk", False),
             [("l7", None), ("kk", None)],
@@ -82,6 +90,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_get_valid_moves_inactive_seven(self):
+        """Testing that the _get_valid_moves recognizes an inactive seven card and returns playable cards accordingly."""
         self.assertEqual(
             self.runner._get_valid_moves(["lk", "ka", "k7"], "l7", False),
             [("lk", None), ("k7", None)],
@@ -89,6 +98,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_get_valid_moves_inactive_ace(self):
+        """Testing that the _get_valid_moves recognizes an inactive ace card and returns playable cards accordingly."""
         self.assertEqual(
             self.runner._get_valid_moves(["lk", "k7", "ka"], "la", False),
             [("lk", None), ("ka", None)],
@@ -96,6 +106,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_get_valid_moves_active_seven(self):
+        """Testing that the _get_valid_moves recognizes an active seven card and returns playable cards accordingly."""
         self.assertEqual(
             self.runner._get_valid_moves(["lk", "ka", "k7"], "l7", True),
             [("k7", None)],
@@ -103,6 +114,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_get_valid_moves_active_ace(self):
+        """Testing that the _get_valid_moves recognizes an active ace card and returns playable cards accordingly."""
         self.assertEqual(
             self.runner._get_valid_moves(["lk", "k7", "ka"], "la", True),
             [("ka", None)],
@@ -110,6 +122,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_get_valid_moves_color_change(self):
+        """Testing that the _get_valid_moves behaves correctly when playing after an color changer card."""
         self.assertEqual(
             self.runner._get_valid_moves(
                 ["l7", "z7", "c7"], "lm", True
@@ -119,6 +132,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_get_valid_moves_empty_invalid_color_and_type(self):
+        """Testing that the _get_valid_moves returns an empty array when no cards can be played."""
         self.assertEqual(
             self.runner._get_valid_moves(["c7", "ca"], "lk", False),
             [],
@@ -126,6 +140,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_get_valid_moves_empty_after_ace(self):
+        """Testing that the _get_valid_moves returns an empty array when there was an active ace and player has no aces in his hand."""
         self.assertEqual(
             self.runner._get_valid_moves(["c7", "ck"], "ca", True),
             [],
@@ -133,6 +148,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_get_valid_moves_empty_after_seven(self):
+        """Testing that the _get_valid_moves returns an empty array when there was an active seven and player has no sevens in his hand."""
         self.assertEqual(
             self.runner._get_valid_moves(["ca", "ck"], "c7", True),
             [],
@@ -140,6 +156,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_minimax_win(self):
+        """Minimax win test."""
         self.assertEqual(
             self.runner.minimax(["lk"], ["z8"], "l9", False, 2, True),
             (100, ("lk", None)),
@@ -147,6 +164,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_minimax_lose(self):
+        """Minimax lose test."""
         self.assertEqual(
             self.runner.minimax(["lk"], ["z9"], "l9", False, 2, False),
             (-100, ("z9", None)),
@@ -154,6 +172,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_minimax_win_two_turns(self):
+        """Minimax win in two turns test."""
         self.assertEqual(
             self.runner.minimax(["lk", "kk"], ["z8"], "l9", False, 4, True),
             (10, ("lk", None)),
@@ -161,6 +180,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_minimax_correct_card_order(self):
+        """Testing if minimax selects the correct card order."""
         self.assertEqual(
             self.runner.minimax(["l8", "lk"], ["z8"], "l9", False, 4, True),
             (10, ("lk", None)),
@@ -168,6 +188,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_minimax_take_card(self):
+        """Testing if rates the take card decision accordingly."""
         self.assertEqual(
             self.runner.minimax(["kk"], ["z8"], "l9", False, 4, True),
             (-10, None),
@@ -175,6 +196,7 @@ class RunnerTests(u.TestCase):
         )
 
     def test_play_card(self):
+        """Play card method test."""
         self.runner.human_player.card_hand.cards = ["lk"]
         self.runner.played_card_pack.cards = ["kk"]
         self.assertTrue(
@@ -194,6 +216,7 @@ class RunnerTests(u.TestCase):
 
     @patch("builtins.print")
     def test_play_card_not_in_pack(self, mock_print):
+        """Play card method card not in pack test."""
         self.runner.human_player.card_hand.cards = ["zk"]
         self.runner.played_card_pack.cards = ["kk"]
         self.assertFalse(
@@ -216,6 +239,7 @@ class RunnerTests(u.TestCase):
 
     @patch("builtins.print")
     def test_play_card_negative(self, mock_print):
+        """Play card method negative test."""
         self.runner.human_player.card_hand.cards = ["zk"]
         self.runner.played_card_pack.cards = ["l9"]
         self.assertFalse(
@@ -231,6 +255,7 @@ class RunnerTests(u.TestCase):
 
     @patch("builtins.input", return_value="Easy")
     def test_select_difficulty_easy(self, mock_input):
+        """Select easy difficulty test."""
         self.runner.select_difficulty()
         self.assertTrue(
             self.runner.easy,
@@ -239,6 +264,7 @@ class RunnerTests(u.TestCase):
 
     @patch("builtins.input", return_value="Hard")
     def test_select_difficulty_hard(self, mock_input):
+        """Select hard difficulty test."""
         self.runner.select_difficulty()
         self.assertFalse(
             self.runner.easy,

@@ -4,11 +4,14 @@ from cards import GiveCardPack, PlayedCardPack, CardHand
 
 
 class CardTests(u.TestCase):
+    """Testcase containing CardPack and CardHand classes and their descendants."""
+
     def setUp(self):
         self.give_pack = GiveCardPack()
         self.played_pack = PlayedCardPack()
 
     def test_givecard_instance(self):
+        """Testing the type of GiveCardPack."""
         self.assertIsInstance(
             self.give_pack.cards,
             deque,
@@ -16,6 +19,7 @@ class CardTests(u.TestCase):
         )
 
     def test_playedcard_instance(self):
+        """Testing the type of PlayedCardPack."""
         self.assertIsInstance(
             self.played_pack.cards,
             deque,
@@ -23,6 +27,7 @@ class CardTests(u.TestCase):
         )
 
     def test_cardhand_instance(self):
+        """Testing the type of CardHand."""
         self.assertIsInstance(
             CardHand().cards,
             list,
@@ -30,6 +35,7 @@ class CardTests(u.TestCase):
         )
 
     def test_generate_cards(self):
+        """Testing the generation of all cards."""
         expected_cards = [
             "la",
             "l7",
@@ -83,6 +89,7 @@ class CardTests(u.TestCase):
         )
 
     def test_give_card(self):
+        """GivePack give card test."""
         given_card = self.give_pack.give_card()
         self.assertIn(
             given_card,
@@ -91,6 +98,7 @@ class CardTests(u.TestCase):
         )
 
     def test_give_card_empty(self):
+        """GivePack emtpy give card test."""
         for _ in range(32):
             self.give_pack.give_card()
         given = self.give_pack.give_card()
@@ -99,6 +107,7 @@ class CardTests(u.TestCase):
         )
 
     def test_give_all_cards(self):
+        """PlayedCardPack give all cards test."""
         self.played_pack.cards = GiveCardPack.generate_all_cards()
         last = self.played_pack.last_card()
         self.played_pack.give_all_cards()
