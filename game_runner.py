@@ -245,7 +245,6 @@ Card values:
             if self.easy
             else [self.human_player.card_hand.cards[:]]
         )
-        print(len(human_hands))
         suggested_moves = []
         for human_hand in human_hands:
             physical_card = self.played_card_pack.last_card()
